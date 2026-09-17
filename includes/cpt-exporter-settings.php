@@ -27,7 +27,7 @@ add_action('admin_init', function () {
       foreach (require_cpts() as $name => $cpt) {
         $saved = is_array($input[$name] ?? null) ? $input[$name] : [];
         $clean[$name] = ['enabled' => !empty($saved['enabled'])];
-        foreach (['taxonomies', 'fields', 'acf'] as $group) {
+        foreach (['fields', 'taxonomies', 'acf'] as $group) {
           $clean[$name][$group] = array_values(array_intersect((array) ($saved[$group] ?? []), array_keys($cpt[$group])));
         }
       }
@@ -36,12 +36,13 @@ add_action('admin_init', function () {
   ]);
 });
 
-// Print the settings form: for each post type, its taxonomies, native fields and ACF fields.
+// Print the settings form: for each post type, its native fields, taxonomies and ACF fields.
+// This order is also the column order of the exports.
 function print_form(): void {
   $settings = get_option('cpt_exporter_settings', []);
   $groups = [
-    'taxonomies' => __('Taxonomies', 'plugin-cpt-exporter'),
     'fields'     => __('Native fields', 'plugin-cpt-exporter'),
+    'taxonomies' => __('Taxonomies', 'plugin-cpt-exporter'),
     'acf'        => __('ACF fields', 'plugin-cpt-exporter'),
   ];
   // A post type's sub-options only show once it is checked: CSS :has(), no JS needed.
@@ -106,8 +107,8 @@ function require_cpts(): array {
     }
     $cpts[$name] = [
       'label'      => $post_type->label,
-      'taxonomies' => wp_list_pluck($taxonomies, 'label'),
       'fields'     => array_filter($native_fields, fn($support) => post_type_supports($name, $support), ARRAY_FILTER_USE_KEY),
+      'taxonomies' => wp_list_pluck($taxonomies, 'label'),
       'acf'        => $acf_fields,
     ];
   }

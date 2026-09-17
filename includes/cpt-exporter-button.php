@@ -2,10 +2,10 @@
 
 if (!defined('ABSPATH')) exit;
 
-// Add an Export dropdown to the list toolbar of post types selected in the settings.
+// Add an Export dropdown to the list toolbar of post types with at least one field selected in the settings.
 add_action('manage_posts_extra_tablenav', function ($which) {
-  $settings = get_option('cpt_exporter_settings', []);
-  if ($which !== 'top' || empty($settings[get_current_screen()->post_type]['enabled']) || !current_user_can('export')) {
+  $post_type = get_current_screen()->post_type;
+  if ($which !== 'top' || !current_user_can('export') || !cpt_exporter_columns($post_type)) {
     return;
   }
   // No "actions" class: WordPress hides those under 782px. The menu overlays the table instead of pushing the toolbar.
@@ -19,8 +19,8 @@ add_action('manage_posts_extra_tablenav', function ($which) {
     <details>
       <summary class="button"><?php esc_html_e('Export', 'plugin-cpt-exporter'); ?> <span aria-hidden="true">▾</span></summary>
       <div>
-        <?php foreach (['CSV', 'XLS'] as $format) : ?>
-          <button type="button" class="button-link"><?php echo esc_html($format); ?></button>
+        <?php foreach (['csv' => 'CSV', 'xlsx' => 'XLSX'] as $format => $label) : ?>
+          <a class="button-link" href="<?php echo esc_url(wp_nonce_url(add_query_arg(['action' => 'cpt_exporter_export', 'post_type' => $post_type, 'format' => $format], admin_url('admin-post.php')), 'cpt_exporter_export')); ?>"><?php echo esc_html($label); ?></a>
         <?php endforeach; ?>
       </div>
     </details>
