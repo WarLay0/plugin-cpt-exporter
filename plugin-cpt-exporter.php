@@ -9,3 +9,4 @@
 if (!defined('ABSPATH')) exit;
 
 require_once __DIR__ . '/includes/cpt-exporter-settings.php';
+require_once __DIR__ . '/includes/cpt-exporter-button.php';
