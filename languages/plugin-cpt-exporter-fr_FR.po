@@ -1,0 +1,108 @@
+# French translation of (Evan) - CPT Exporter Plugin.
+# Copyright (C) 2026 Evan BOMBART
+# This file is distributed under the same license as the (Evan) - CPT Exporter Plugin plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: (Evan) - CPT Exporter Plugin 0.0.1\n"
+"Report-Msgid-Bugs-To: https://github.com/WarLay0/plugin-cpt-exporter/issues\n"
+"Last-Translator: Evan BOMBART\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-17T14:37:00+00:00\n"
+"PO-Revision-Date: 2026-09-17 16:40+0200\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: plugin-cpt-exporter\n"
+
+#. Plugin Name of the plugin
+#: plugin-cpt-exporter.php
+msgid "(Evan) - CPT Exporter Plugin"
+msgstr "(Evan) - CPT Exporter Plugin"
+
+#. Description of the plugin
+#: plugin-cpt-exporter.php
+msgid "Exports custom post types."
+msgstr "Exporte les types de contenu personnalisés."
+
+#. Author of the plugin
+#: plugin-cpt-exporter.php
+msgid "Evan BOMBART"
+msgstr "Evan BOMBART"
+
+#: includes/cpt-exporter-button.php:20
+msgid "Export"
+msgstr "Exporter"
+
+#: includes/cpt-exporter-export.php:9
+msgid "Sorry, you are not allowed to export content."
+msgstr "Désolé, vous n’avez pas l’autorisation d’exporter du contenu."
+
+#: includes/cpt-exporter-export.php:14
+msgid "Unknown export format."
+msgstr "Format d’export inconnu."
+
+#: includes/cpt-exporter-export.php:18
+msgid "Nothing to export: select this post type and at least one field in Settings > CPT Exporter."
+msgstr "Rien à exporter : cochez ce type de contenu et au moins un champ dans Réglages > CPT Exporter."
+
+#: includes/cpt-exporter-export.php:65
+msgid "Parent"
+msgstr "Parent"
+
+#: includes/cpt-exporter-export.php:66
+msgid "Order"
+msgstr "Ordre"
+
+#: includes/cpt-exporter-settings.php:46
+msgid "Native field"
+msgstr "Champ natif"
+
+#: includes/cpt-exporter-settings.php:47
+msgid "Taxonomy"
+msgstr "Taxonomie"
+
+#: includes/cpt-exporter-settings.php:48
+msgid "ACF field"
+msgstr "Champ ACF"
+
+#. translators: %s: field or taxonomy label.
+#: includes/cpt-exporter-settings.php:62
+#, php-format
+msgid "Move %s"
+msgstr "Déplacer %s"
+
+#: includes/cpt-exporter-settings.php:85
+msgid "Title"
+msgstr "Titre"
+
+#: includes/cpt-exporter-settings.php:86
+msgid "Content"
+msgstr "Contenu"
+
+#: includes/cpt-exporter-settings.php:87
+msgid "Excerpt"
+msgstr "Extrait"
+
+#: includes/cpt-exporter-settings.php:88
+msgid "Featured image"
+msgstr "Image mise en avant"
+
+#: includes/cpt-exporter-settings.php:89
+msgid "Author"
+msgstr "Auteur"
+
+#: includes/cpt-exporter-settings.php:90
+msgid "Page attributes"
+msgstr "Attributs de page"
+
+#: includes/cpt-exporter-xlsx.php:9
+msgid "XLSX export requires the PHP zip extension."
+msgstr "L’export XLSX nécessite l’extension PHP zip."
+
+#: includes/cpt-exporter-xlsx.php:18
+#: includes/cpt-exporter-xlsx.php:45
+msgid "The XLSX file could not be created."
+msgstr "Le fichier XLSX n’a pas pu être créé."

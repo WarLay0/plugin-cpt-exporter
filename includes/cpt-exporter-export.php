@@ -32,7 +32,7 @@ add_action('admin_post_cpt_exporter_export', function () {
   exit;
 });
 
-// Columns of a selected post type, in the settings page order: native fields, taxonomies, then ACF fields.
+// Columns of a selected post type: its checked items, in the order they were dragged into on the settings page.
 // Each column has a label and a callback turning a post into the cell text. Empty when nothing is selected.
 function cpt_exporter_columns(string $post_type): array {
   $selection = get_option('cpt_exporter_settings', [])[$post_type] ?? [];
@@ -40,8 +40,6 @@ function cpt_exporter_columns(string $post_type): array {
   if (!$cpt || empty($selection['enabled'])) {
     return [];
   }
-  // Iterating over the page's own lists keeps its order, whatever the order the selection was saved in.
-  $selected = fn(string $group) => array_intersect_key($cpt[$group], array_flip($selection[$group] ?? []));
 
   $native = [
     'title'     => fn(WP_Post $post) => cpt_exporter_text($post->post_title),
@@ -51,23 +49,24 @@ function cpt_exporter_columns(string $post_type): array {
     'author'    => fn(WP_Post $post) => (string) get_the_author_meta('display_name', $post->post_author),
   ];
   $columns = [];
-  foreach ($selected('fields') as $field => $label) {
-    if ($field === 'page-attributes') {
+  foreach (cpt_exporter_items($cpt, $selection['order'] ?? []) as ['group' => $group, 'key' => $key, 'label' => $label]) {
+    if (!in_array($key, $selection[$group] ?? [], true)) {
+      continue;
+    }
+    if ($group === 'taxonomies') {
+      $columns[] = ['label' => $label, 'value' => function (WP_Post $post) use ($key) {
+        $terms = get_the_terms($post, $key);
+        return is_array($terms) ? implode(', ', array_map(fn(WP_Term $term) => cpt_exporter_text($term->name), $terms)) : '';
+      }];
+    } elseif ($group === 'acf') {
+      $columns[] = ['label' => $label, 'value' => fn(WP_Post $post) => cpt_exporter_acf_text(get_field($key, $post->ID))];
+    } elseif ($key === 'page-attributes') {
       // Two values behind one support: parent and menu order.
       $columns[] = ['label' => __('Parent', 'plugin-cpt-exporter'), 'value' => fn(WP_Post $post) => $post->post_parent ? cpt_exporter_text(get_post_field('post_title', $post->post_parent)) : ''];
       $columns[] = ['label' => __('Order', 'plugin-cpt-exporter'), 'value' => fn(WP_Post $post) => (string) $post->menu_order];
     } else {
-      $columns[] = ['label' => $label, 'value' => $native[$field]];
+      $columns[] = ['label' => $label, 'value' => $native[$key]];
     }
-  }
-  foreach ($selected('taxonomies') as $taxonomy => $label) {
-    $columns[] = ['label' => $label, 'value' => function (WP_Post $post) use ($taxonomy) {
-      $terms = get_the_terms($post, $taxonomy);
-      return is_array($terms) ? implode(', ', array_map(fn(WP_Term $term) => cpt_exporter_text($term->name), $terms)) : '';
-    }];
-  }
-  foreach ($selected('acf') as $key => $label) {
-    $columns[] = ['label' => $label, 'value' => fn(WP_Post $post) => cpt_exporter_acf_text(get_field($key, $post->ID))];
   }
   return $columns;
 }
