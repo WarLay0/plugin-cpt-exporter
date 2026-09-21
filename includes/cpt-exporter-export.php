@@ -140,7 +140,10 @@ function cpt_exporter_acf_text(mixed $value): string {
 function cpt_exporter_send_headers(string $filename, string $content_type, ?int $length = null): void {
   nocache_headers();
   header('Content-Type: ' . $content_type);
-  header('Content-Disposition: attachment; filename="' . $filename . '"');
+  // RFC 5987: encode filename for non-ASCII characters and special chars; provide ASCII fallback.
+  $ascii_filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+  $encoded_filename = rawurlencode($filename);
+  header("Content-Disposition: attachment; filename=\"{$ascii_filename}\"; filename*=UTF-8''{$encoded_filename}");
   header('X-Content-Type-Options: nosniff');
   if ($length !== null) {
     header('Content-Length: ' . $length);
