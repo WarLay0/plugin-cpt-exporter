@@ -101,7 +101,8 @@ function require_cpts(): array {
         foreach (acf_get_fields($group) as $field) {
           // Layout fields hold no value.
           if (!in_array($field['type'], ['tab', 'message', 'accordion'], true)) {
-            $acf_fields[$field['key']] = $field['label'];
+            // The label set in ACF, or the field name when the label is left empty.
+            $acf_fields[$field['key']] = trim($field['label']) !== '' ? $field['label'] : $field['name'];
           }
         }
       }
