@@ -30,20 +30,22 @@ add_action('admin_init', function () {
         foreach (['fields', 'taxonomies', 'acf'] as $group) {
           $clean[$name][$group] = array_values(array_intersect((array) ($saved[$group] ?? []), array_keys($cpt[$group])));
         }
+        // Rows in the order they were dropped, each known row once.
+        $clean[$name]['order'] = array_values(array_unique(array_intersect((array) ($saved['order'] ?? []), array_keys(cpt_exporter_items($cpt, [])))));
       }
       return $clean;
     },
   ]);
 });
 
-// Print the settings form: for each post type, its native fields, taxonomies and ACF fields.
-// This order is also the column order of the exports.
+// Print the settings form: for each post type, one list of its native fields, taxonomies and ACF fields
+// to check and drag into place. The list order is the column order of the exports.
 function print_form(): void {
   $settings = get_option('cpt_exporter_settings', []);
   $groups = [
-    'fields'     => __('Native fields', 'plugin-cpt-exporter'),
-    'taxonomies' => __('Taxonomies', 'plugin-cpt-exporter'),
-    'acf'        => __('ACF fields', 'plugin-cpt-exporter'),
+    'fields'     => __('Native field', 'plugin-cpt-exporter'),
+    'taxonomies' => __('Taxonomy', 'plugin-cpt-exporter'),
+    'acf'        => __('ACF field', 'plugin-cpt-exporter'),
   ];
   // A post type's sub-options only show once it is checked: CSS :has(), no JS needed.
   ?>
@@ -53,16 +55,15 @@ function print_form(): void {
     <?php foreach (require_cpts() as $name => $cpt) : $saved = $settings[$name] ?? []; $prefix = "cpt_exporter_settings[$name]"; ?>
       <div class="cpt-exporter-type">
         <label><input type="checkbox" name="<?php echo esc_attr("{$prefix}[enabled]"); ?>" value="1" <?php checked(!empty($saved['enabled'])); ?>> <strong><?php echo esc_html($cpt['label']); ?></strong></label>
-        <div class="cpt-exporter-details">
-          <?php foreach ($groups as $group => $title) : if (!$cpt[$group]) continue; ?>
-            <fieldset>
-              <legend><?php echo esc_html($title); ?></legend>
-              <?php foreach ($cpt[$group] as $value => $label) : ?>
-                <label><input type="checkbox" name="<?php echo esc_attr("{$prefix}[{$group}][]"); ?>" value="<?php echo esc_attr($value); ?>" <?php checked(in_array($value, $saved[$group] ?? [], true)); ?>> <?php echo esc_html($label); ?></label><br>
-              <?php endforeach; ?>
-            </fieldset>
+        <ol class="cpt-exporter-details">
+          <?php foreach (cpt_exporter_items($cpt, $saved['order'] ?? []) as $id => ['group' => $group, 'key' => $key, 'label' => $label]) : ?>
+            <li>
+              <input type="hidden" name="<?php echo esc_attr("{$prefix}[order][]"); ?>" value="<?php echo esc_attr($id); ?>">
+              <button type="button" class="cpt-exporter-handle" aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field or taxonomy label. */ __('Move %s', 'plugin-cpt-exporter'), $label)); ?>"><span class="dashicons dashicons-menu" aria-hidden="true"></span></button>
+              <label><input type="checkbox" name="<?php echo esc_attr("{$prefix}[{$group}][]"); ?>" value="<?php echo esc_attr($key); ?>" <?php checked(in_array($key, $saved[$group] ?? [], true)); ?>> <?php echo esc_html($label); ?> (<?php echo esc_html($groups[$group]); ?>)</label>
+            </li>
           <?php endforeach; ?>
-        </div>
+        </ol>
       </div>
     <?php endforeach; ?>
     <?php submit_button(); ?>
